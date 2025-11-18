@@ -1,0 +1,133 @@
+body {
+    font-family: "Inter", Arial, sans-serif;
+    background: #f5f7fa;
+    margin: 0;
+    padding: 30px;
+    color: #2d2d2d;
+}
+
+h2 {
+    margin-bottom: 20px;
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a73e8;
+}
+
+label {
+    font-size: 15px;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+input[type="file"] {
+    padding: 12px;
+    background: #fff;
+    border: 2px solid #dce3ec;
+    border-radius: 10px;
+    width: 350px;
+    cursor: pointer;
+    transition: 0.2s ease;
+    margin-bottom: 12px;
+}
+
+input[type="file"]:hover {
+    border-color: #1a73e8;
+    background: #eef5ff;
+}
+
+button {
+    margin-top: 20px;
+    padding: 12px 22px;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.25s ease;
+    box-shadow: 0px 4px 8px rgba(26, 115, 232, 0.25);
+}
+
+button:hover {
+    background: #0d5fcc;
+    box-shadow: 0px 6px 12px rgba(26, 115, 232, 0.35);
+}
+
+#result {
+    margin-top: 30px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 22px;
+    border-left: 5px solid #1a73e8;
+    padding-left: 10px;
+    font-weight: 700;
+}
+
+h4 {
+    margin-top: 30px;
+    margin-bottom: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #444;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 3px 10px rgba(0,0,0,0.07);
+}
+
+th {
+    background: #1a73e8;
+    color: white;
+    padding: 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #e6e6e6;
+    font-size: 14px;
+}
+
+tr:nth-child(even) {
+    background: #f9fbff;
+}
+
+tr:hover td {
+    background: #eef5ff;
+}
+
+p i {
+    color: #777;
+}
+
+#info-elb {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: #1a73e8;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.15);
+    opacity: 0.95;
+}
