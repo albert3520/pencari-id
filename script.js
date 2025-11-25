@@ -57,19 +57,27 @@ function processFiles() {
     // ====== FILE IDN CSV ======
     readCSV(file1, file1Rows => {
         let idnMap = {};
+        let idnRefMap = {};
 
         for (let i = 1; i < file1Rows.length; i++) {
             const row = file1Rows[i];
             const id = row[0];
             const nominal = row[7];
+            const noRef = row[1];
+            
             if (!isNaN(Number(String(nominal).replace(/[^0-9]/g, "")))) {
-            totalIDN_All += Number(String(nominal).replace(/[^0-9]/g, ""));
-        }
-            if (id) idnMap[id.trim()] = nominal ? formatNumber(nominal) : "";
+                totalIDN_All += Number(String(nominal).replace(/[^0-9]/g, ""));
+            }
+            
+            if (id) {
+                idnMap[id.trim()] = nominal ? formatNumber(nominal) : "";
+                idnRefMap[id.trim()] = noRef || "";
+            }
         }
 
         // ====== FILE MOTION XLSX ======
         let motionMap = {};
+        let motionRefMap = {};
         let dateMismatchList = [];
         let filesProcessed = 0;
 
@@ -83,6 +91,8 @@ function processFiles() {
                     const desc = row[5];     // kolom F
                     const extractedId = extractIdFromDescription(desc);
                     const nominal = row[14]; // kolom O
+                    const noRefMotion = row[3] ? cleanMotionReference(row[3]) : "";
+                    
                     if (!isNaN(Number(String(nominal).replace(/[^0-9]/g, "")))) {
                         totalMotion_All += Number(String(nominal).replace(/[^0-9]/g, ""));
                     }
@@ -107,21 +117,26 @@ function processFiles() {
 
                     if (extractedId) {
                         motionMap[extractedId] = nominal ? formatNumber(nominal) : "";
+                        motionRefMap[extractedId] = noRefMotion;
                     }
                 }
 
                 filesProcessed++;
 
                 if (filesProcessed === file2List.length) {
-                    compareResults(idnMap, motionMap, dateMismatchList);
+                    compareResults(idnMap, motionMap, idnRefMap, motionRefMap, dateMismatchList);
                 }
             });
         }
     });
 }
 
-function compareResults(idnMap, motionMap, dateMismatchList) {
+function cleanMotionReference(ref) {
+    if (!ref) return "";
+    return String(ref).replace(/^'/, "").trim();
+}
 
+function compareResults(idnMap, motionMap, idnRefMap, motionRefMap, dateMismatchList) {
     let onlyInIDN = [];
     let onlyInMotion = [];
 
@@ -133,12 +148,26 @@ function compareResults(idnMap, motionMap, dateMismatchList) {
     allIDs.forEach(id => {
         const nomIDN = idnMap[id];
         const nomMotion = motionMap[id];
+        const refIDN = idnRefMap[id] || "-";
+        const refMotion = motionRefMap[id] || "-";
 
         if (nomIDN && !nomMotion) {
-            onlyInIDN.push({ id, idn: nomIDN, motion: "-" });
+            onlyInIDN.push({ 
+                id, 
+                idn: nomIDN, 
+                motion: "-",
+                refIDN: refIDN,
+                refMotion: "-"
+            });
 
         } else if (!nomIDN && nomMotion) {
-            onlyInMotion.push({ id, idn: "-", motion: nomMotion });
+            onlyInMotion.push({ 
+                id, 
+                idn: "-", 
+                motion: nomMotion,
+                refIDN: "-",
+                refMotion: refMotion
+            });
         }
     });
 
@@ -149,24 +178,24 @@ function showResult(miss1, miss2, dateMismatch) {
     let html = "<h3>Hasil Anomali Deposit</h3>";
 
     // TABEL TOTAL NOMINAL IDN & MOTION
-        let selisihTotal = totalIDN_All - totalMotion_All;
-        html += `
-            <table>
-                <tr>
-                    <th>Total IDN</th>
-                    <th>Total Motion</th>
-                    <th>Selisih</th>
-                </tr>
-                <tr>
-                    <td>${formatNominal(totalIDN_All)}</td>
-                    <td>${formatNominal(totalMotion_All)}</td>
-                    <td>${formatNominal(selisihTotal)}</td>
-                </tr>
-            </table>
-            <br>
-        `;
+    let selisihTotal = totalIDN_All - totalMotion_All;
+    html += `
+        <table>
+            <tr>
+                <th>Total IDN</th>
+                <th>Total Motion</th>
+                <th>Selisih</th>
+            </tr>
+            <tr>
+                <td>${formatNominal(totalIDN_All)}</td>
+                <td>${formatNominal(totalMotion_All)}</td>
+                <td>${formatNominal(selisihTotal)}</td>
+            </tr>
+        </table>
+        <br>
+    `;
 
-    // TABEL MISS 1
+    // TABEL MISS 1 - ID Ada di IDN tapi Tidak Ada di Motion
     html += "<h4>ID Ada di IDN tapi Tidak Ada di Motion</h4>";
 
     if (miss1.length === 0) {
@@ -179,31 +208,28 @@ function showResult(miss1, miss2, dateMismatch) {
             <table>
                 <tr>
                     <th>ID</th>
-                    <th>Nominal di IDN</th>
-                    <th>Nominal di Motion</th>
+                    <th>Nomor Ref</th>
+                    <th>Nominal</th>
                 </tr>
         `;
 
         miss1.forEach(a => {
             if (a.idn !== "-")
                 totalIDN_1 += Number(String(a.idn).replace(/[^0-9]/g, ""));
-            if (a.motion !== "-")
-                totalMotion_1 += Number(String(a.motion).replace(/[^0-9]/g, ""));
 
             table1 += `
                 <tr>
                     <td>${a.id}</td>
+                    <td>${a.refIDN}</td>
                     <td>${a.idn !== "-" ? formatNominal(a.idn) : "-"}</td>
-                    <td>${a.motion !== "-" ? formatNominal(a.motion) : "-"}</td>
                 </tr>
             `;
         });
 
         table1 += `
             <tr style="font-weight:bold; background:#f5f5f5;">
-                <td>TOTAL</td>
+                <td colspan="2">TOTAL</td>
                 <td>${formatNominal(totalIDN_1)}</td>
-                <td>${formatNominal(totalMotion_1)}</td>
             </tr>
         `;
 
@@ -211,7 +237,7 @@ function showResult(miss1, miss2, dateMismatch) {
         html += table1;
     }
 
-    // TABEL MISS 2
+    // TABEL MISS 2 - ID Ada di Motion tapi Tidak Ada di IDN
     html += "<h4>ID Ada di Motion tapi Tidak Ada di IDN</h4>";
 
     if (miss2.length === 0) {
@@ -224,21 +250,19 @@ function showResult(miss1, miss2, dateMismatch) {
             <table>
                 <tr>
                     <th>ID</th>
-                    <th>Nominal di IDN</th>
-                    <th>Nominal di Motion</th>
+                    <th>Nomor Ref</th>
+                    <th>Nominal</th>
                 </tr>
         `;
 
         miss2.forEach(a => {
-            if (a.idn !== "-")
-                totalIDN_2 += Number(String(a.idn).replace(/[^0-9]/g, ""));
             if (a.motion !== "-")
                 totalMotion_2 += Number(String(a.motion).replace(/[^0-9]/g, ""));
 
             table2 += `
                 <tr>
                     <td>${a.id}</td>
-                    <td>${a.idn !== "-" ? formatNominal(a.idn) : "-"}</td>
+                    <td>${a.refMotion}</td>
                     <td>${a.motion !== "-" ? formatNominal(a.motion) : "-"}</td>
                 </tr>
             `;
@@ -246,8 +270,7 @@ function showResult(miss1, miss2, dateMismatch) {
 
         table2 += `
             <tr style="font-weight:bold; background:#f5f5f5;">
-                <td>TOTAL</td>
-                <td>${formatNominal(totalIDN_2)}</td>
+                <td colspan="2">TOTAL</td>
                 <td>${formatNominal(totalMotion_2)}</td>
             </tr>
         `;
@@ -336,91 +359,101 @@ function processWithdraw() {
 
     // ========== BACA FILE 1 (XLSX) ==========
     readXLSX(file1, sheet1 => {
-        let idnData = {};
+    let idnData = {};
+    let idnRefMap = {}; // NEW: Simpan referensi dari file1 (Kolom A)
 
-        for (let i = 1; i < sheet1.length; i++) {
-            const row = sheet1[i];
-            const username = row[2];   // kolom C
-            const nominal = row[7];    // kolom H
+    for (let i = 1; i < sheet1.length; i++) {
+        const row = sheet1[i];
+        const noRef = row[0];      // Kolom A - Trx Number
+        const username = row[2];   // kolom C
+        const nominal = row[7];    // kolom H
 
-            if (!username) continue;
+        if (!username) continue;
 
-            const u = String(username).trim();
-            if (u.toLowerCase() === "username") continue;
+        const u = String(username).trim();
+        if (u.toLowerCase() === "username") continue;
 
-            const clean = String(nominal).replace(/[^0-9]/g, "");
-            if (!clean) continue;
+        const clean = String(nominal).replace(/[^0-9]/g, "");
+        if (!clean) continue;
 
-            if (!idnData[u]) idnData[u] = [];
-            idnData[u].push(Number(clean));
+        if (!idnData[u]) idnData[u] = [];
+        idnData[u].push(Number(clean));
         
-            const nominalPembukuan = row[7];
-
-            if (!isNaN(Number(String(nominalPembukuan).replace(/[^0-9]/g, "")))) {
-                totalPembukuan_All += Number(String(nominalPembukuan).replace(/[^0-9]/g, ""));
-            }
+        if (!idnRefMap[u]) idnRefMap[u] = [];
+        idnRefMap[u].push(noRef || "-");
+    
+        const nominalPembukuan = row[7];
+        if (!isNaN(Number(String(nominalPembukuan).replace(/[^0-9]/g, "")))) {
+            totalPembukuan_All += Number(String(nominalPembukuan).replace(/[^0-9]/g, ""));
         }
+    }
 
         // ========== BACA FILE 2 (XLSX) ==========
         let motionData = {};
+        let motionRefMap = {};
         let processed = 0;
 
         for (let f = 0; f < file2.length; f++) {
             readXLSX(file2[f], sheet2 => {
-
                 for (let i = 1; i < sheet2.length; i++) {
                     const row = sheet2[i];
-
-                    const desc = row[7];   // kolom H
-                    const nominal = row[9]; // kolom J (nominal motion)
+                    const noRef = row[2];   // Kolom C - No Ref
+                    const desc = row[7];    // kolom H
+                    const nominal = row[9]; // kolom J
 
                     if (!desc) continue;
 
                     const firstWord = String(desc).trim().split(" ")[0];
                     if (!firstWord) continue;
 
-                    // Bersihkan nominal
                     const clean2 = String(nominal).replace(/[^0-9]/g, "");
                     if (!clean2) continue;
 
                     if (!motionData[firstWord]) motionData[firstWord] = [];
                     motionData[firstWord].push(Number(clean2));
+                    
+                    if (!motionRefMap[firstWord]) motionRefMap[firstWord] = [];
+                    motionRefMap[firstWord].push(noRef || "-");
                 
                     const nominalMotionW = row[9];
-
                     if (!isNaN(Number(String(nominalMotionW).replace(/[^0-9]/g, "")))) {
                         totalWithdrawMotion_All += Number(String(nominalMotionW).replace(/[^0-9]/g, ""));
                     }
                 }
 
                 processed++;
-
                 if (processed === file2.length) {
-                    compareWithdraw(idnData, motionData);
+                    compareWithdraw(idnData, motionData, idnRefMap, motionRefMap);
                 }
             });
         }
     });
 }
 
-function compareWithdraw(idnData, motionData) {
+
+function compareWithdraw(idnData, motionData, idnRefMap, motionRefMap) {
     let allIDs = new Set([...Object.keys(idnData), ...Object.keys(motionData)]);
     let anomalies = [];
 
     allIDs.forEach(id => {
         const list1 = idnData[id] || [];
         const list2 = motionData[id] || [];
+        const refs1 = idnRefMap[id] || [];
+        const refs2 = motionRefMap[id] || [];
 
         if (list1.length !== list2.length) {
-
             let temp1 = [...list1];
             let temp2 = [...list2];
+            let tempRefs1 = [...refs1];
+            let tempRefs2 = [...refs2];
 
             for (let i = temp1.length - 1; i >= 0; i--) {
                 const idx = temp2.indexOf(temp1[i]);
                 if (idx !== -1) {
                     temp1.splice(i, 1);
                     temp2.splice(idx, 1);
+                    tempRefs1.splice(i, 1);
+                    tempRefs2.splice(idx, 1);
                 }
             }
 
@@ -428,8 +461,10 @@ function compareWithdraw(idnData, motionData) {
                 id: id,
                 f1: list1.length,
                 f2: list2.length,
-                missingFromFile2: temp1, // nominal lebih di File1
-                missingFromFile1: temp2  // nominal lebih di File2
+                missingFromFile2: temp1,
+                missingFromFile1: temp2,
+                missingRefsFile2: tempRefs1,
+                missingRefsFile1: tempRefs2
             });
         }
     });
@@ -464,14 +499,14 @@ function showWithdrawResult(list) {
     }
 
     html += "<h4>ID Anomali</h4>";
-    html += `
+html += `
     <table>
         <tr>
             <th>ID</th>
-            <th>Jumlah di Pembukuan</th>
-            <th>Jumlah di Motion</th>
-            <th>Nominal lebih di Pembukuan</th>
-            <th>Nominal lebih di Motion</th>
+            <th>Jumlah Pembukuan</th>
+            <th>Jumlah Motion</th>
+            <th>Nominal Pembukuan</th>
+            <th>Nominal Motion</th>
         </tr>
     `;
 
@@ -479,7 +514,6 @@ function showWithdrawResult(list) {
     let totalMotion = 0;
 
     list.forEach(a => {
-
         a.missingFromFile2.forEach(v => totalPembukuan += Number(v));
         a.missingFromFile1.forEach(v => totalMotion += Number(v));
 
@@ -491,14 +525,18 @@ function showWithdrawResult(list) {
             <td>
                 ${
                     a.missingFromFile2.length
-                    ? a.missingFromFile2.map(formatNominal).join("<br>")
+                    ? a.missingFromFile2.map((v, index) => 
+                        `${formatNominal(v)}<br><small style="color:#666">${a.missingRefsFile2[index] || "-"}</small>`
+                      ).join("<br>")
                     : "-"
                 }
             </td>
             <td>
                 ${
                     a.missingFromFile1.length
-                    ? a.missingFromFile1.map(formatNominal).join("<br>")
+                    ? a.missingFromFile1.map((v, index) => 
+                        `${formatNominal(v)}<br><small style="color:#666">${a.missingRefsFile1[index] || "-"}</small>`
+                      ).join("<br>")
                     : "-"
                 }
             </td>
@@ -515,7 +553,6 @@ function showWithdrawResult(list) {
     `;
 
     html += "</table>";
-
     document.getElementById("wresult").innerHTML = html;
 }
 
