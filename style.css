@@ -181,3 +181,70 @@ p i {
     from { opacity: 0; transform: translateY(-15px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ========== STYLE TOMBOL DOWNLOAD ========== */
+button[onclick*="downloadDepositExcel"] {
+    background: #28a745 !important;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
+    margin-left: 15px;
+}
+
+button[onclick*="downloadDepositExcel"]:hover {
+    background: #218838 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+button[onclick*="downloadDepositExcel"]:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+/* Tombol Download Semua Data */
+button[onclick*="All_Anomalies"] {
+    background: #17a2b8 !important;
+    box-shadow: 0 2px 6px rgba(23, 162, 184, 0.3);
+    margin: 20px auto 0 auto;
+    display: block;
+}
+
+button[onclick*="All_Anomalies"]:hover {
+    background: #138496 !important;
+    box-shadow: 0 4px 12px rgba(23, 162, 184, 0.4);
+}
+
+/* Tombol Download IDN */
+button[onclick*="IDN_Tidak_Di_Motion"] {
+    background: #28a745 !important;
+}
+
+/* Tombol Download Motion */
+button[onclick*="Motion_Tidak_Di_IDN"] {
+    background: #28a745 !important;
+}
+
+@media (max-width: 768px) {
+    button[onclick*="downloadDepositExcel"] {
+        padding: 8px 12px;
+        font-size: 12px;
+        margin-left: 10px;
+    }
+    
+    .download-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 10px;
+    }
+    
+    .download-header h4 {
+        margin-bottom: 0;
+    }
+}
