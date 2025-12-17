@@ -154,13 +154,11 @@ p i {
     box-shadow: 0px 6px 20px rgba(0,0,0,0.25);
     animation: fadeIn 0.25s ease;
 
-    /* CENTER DI LAYAR */
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 
-    /* Jika teks panjang → scroll di dalam modal */
     max-height: 80vh;
     overflow-y: auto;
 }
@@ -279,8 +277,252 @@ button[onclick*="Motion_Tidak_Di_IDN"] {
     margin-top: 5px;
 }
 
-.footer-version {
-    color: #888;
-    font-size: 12px;
-    margin-top: 3px;
+/* ========== FLOATING BUTTON STYLES ========== */
+#floating-button-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+}
+
+#floating-button {
+    width: 70px;
+    height: 70px;
+    background: transparent !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: none;
+    transition: all 0.3s ease;
+    border: none;
+    outline: none;
+    overflow: hidden;
+    position: relative;
+    padding: 0;
+}
+
+#floating-button:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+#floating-button:active {
+    transform: scale(0.95);
+}
+
+.floating-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    user-select: none;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+}
+
+#floating-button:hover .floating-logo {
+    transform: scale(1.05);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4)) brightness(1.05);
+}
+
+/* Efek glow pada logo saat hover */
+#floating-button:hover::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, rgba(255,255,255,0.2) 0%, transparent 70%);
+    animation: logoGlow 2s infinite;
+}
+
+@keyframes logoGlow {
+    0%, 100% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+/* Floating menu */
+.floating-menu {
+    position: absolute;
+    bottom: 85px;
+    right: 0;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    padding: 12px 0;
+    border: 1px solid #e0e0e0;
+    z-index: 1001;
+}
+
+.floating-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.floating-menu-item {
+    padding: 14px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+    color: #333;
+    font-weight: 500;
+    font-size: 14px;
+    position: relative;
+}
+
+.floating-menu-item:hover {
+    background: linear-gradient(to left, #eef5ff, #ffffff);
+    color: #1a73e8;
+    padding-right: 25px;
+}
+
+.floating-menu-item span {
+    white-space: nowrap;
+    flex-grow: 1;
+}
+
+.floating-menu-item::before {
+    content: "•";
+    color: #1a73e8;
+    font-size: 20px;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.floating-menu-item::after {
+    content: "←";
+    color: #999;
+    font-size: 14px;
+    margin-left: 5px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.floating-menu-item:hover::after {
+    opacity: 1;
+}
+
+/* Animasi untuk menu items */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.floating-menu.show .floating-menu-item {
+    animation: slideInRight 0.3s ease forwards;
+}
+
+.floating-menu.show .floating-menu-item:nth-child(1) { animation-delay: 0.05s; }
+.floating-menu.show .floating-menu-item:nth-child(2) { animation-delay: 0.1s; }
+.floating-menu.show .floating-menu-item:nth-child(3) { animation-delay: 0.15s; }
+.floating-menu.show .floating-menu-item:nth-child(4) { animation-delay: 0.2s; }
+
+/* Badge notifikasi (opsional) */
+#floating-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff4757;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: badgePulse 1.5s infinite;
+    z-index: 1002;
+    border: 2px solid white;
+}
+
+@keyframes badgePulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 5px rgba(255, 71, 87, 0);
+    }
+}
+
+/* Efek border untuk logo (opsional) */
+.logo-border {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 2px solid rgba(26, 115, 232, 0.5);
+    border-radius: 50%;
+    animation: borderRotate 3s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes borderRotate {
+    0% {
+        transform: rotate(0deg);
+        border-color: rgba(26, 115, 232, 0.5);
+    }
+    50% {
+        border-color: rgba(26, 115, 232, 0.8);
+    }
+    100% {
+        transform: rotate(360deg);
+        border-color: rgba(26, 115, 232, 0.5);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #floating-button-container {
+        bottom: 20px;
+        right: 20px;
+    }
+    
+    #floating-button {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .floating-menu {
+        min-width: 180px;
+        bottom: 75px;
+    }
+    
+    .floating-menu-item {
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+    
+    #floating-badge {
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+    }
 }
