@@ -5,7 +5,7 @@
 <title>Cek ID yang Tidak Cocok</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-<!-- Inject CSS dari file terpisah -->
+<!-- ================ STYLE CSS ================ -->
 <link rel="stylesheet" href="style.css">
 
 </head>
@@ -93,13 +93,32 @@
         <p class="footer-creator">
             Created by ELB
         </p>
-        <p class="footer-version">
-            Version 1.0 | Update Terakhir 30 November 2025
-        </p>
     </div>
 </div>
 <!-- ================================================== -->
 
+<!-- ===================== FLOATING BUTTON ===================== -->
+<div id="floating-button-container">
+    <!-- Button utama -->
+    <div id="floating-button" title="Cek Kreasi Gua Yang Lain" onclick="toggleFloatingMenu()">
+        <img src="logo-game.png" alt="Game Logo" class="floating-logo" id="floating-logo">
+    </div>
+    
+    <!-- Menu popup -->
+    <div id="floating-menu" class="floating-menu">
+        <div class="floating-menu-item" onclick="navigateToLink('https://prediksi-togel-9lq.pages.dev/')">
+            <span>📊 Prediksi Togel</span>
+        </div>
+        <div class="floating-menu-item" onclick="navigateToLink('https://slot-game-282.pages.dev/')">
+            <span>🎰 Simulasi Game Slot</span>
+        </div>
+        <div class="floating-menu-item" onclick="navigateToLink('https://mancing-mania-7uq.pages.dev/')">
+            <span>🎣 Mancing Mania</span>
+        </div>
+    </div>
+</div>
+<!-- ========================================================== -->
+   
 <script src="script.js"></script>
 
 </body>
